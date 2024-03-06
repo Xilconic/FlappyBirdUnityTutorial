@@ -423,6 +423,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Obstacle: {fileID: 3220547950085693013, guid: d7160bdb80588de419f4ff72bc23546f, type: 3}
+  SpawnCooldownInSeconds: 2
+  VerticalRandomizationOffset: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
