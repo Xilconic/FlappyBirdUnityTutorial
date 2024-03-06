@@ -563,6 +563,8 @@ MonoBehaviour:
   BirdPhysics: {fileID: 520051552}
   flapStrength: 10
   LogicManager: {fileID: 1586286740}
+  KillFloorDepth: -6.5
+  ControlCeiling: 6.5
 --- !u!1 &739859373
 GameObject:
   m_ObjectHideFlags: 0
