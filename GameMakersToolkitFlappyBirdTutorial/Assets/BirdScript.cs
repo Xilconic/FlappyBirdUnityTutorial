@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class BirdScript : MonoBehaviour
 {
+    [Tooltip("Required 2D physics of the Bird character.")]
     public Rigidbody2D BirdPhysics;
+
+    [Tooltip("Enables tweaking the strength of the wing-flap of the Bird, when pressing Space.")]
     public float flapStrength = 10;
 
     // Start is called before the first frame update
