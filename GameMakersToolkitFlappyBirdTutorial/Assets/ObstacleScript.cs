@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ObstacleScript : MonoBehaviour
 {
+    /// <summary>
+    /// Obstacle destroys itself after reaching this point.
+    /// </summary>
+    private const float deadZoneX = -13;
+
     [Tooltip("Defines the speed this obstacle moves from right to left on the screen.")]
     public float moveSpeed = 5;
 
@@ -16,6 +21,13 @@ public class ObstacleScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = transform.position + (Vector3.left * moveSpeed) * Time.deltaTime;
+        if(transform.position.x <= deadZoneX)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            transform.position = transform.position + (Vector3.left * moveSpeed) * Time.deltaTime;
+        }
     }
 }
