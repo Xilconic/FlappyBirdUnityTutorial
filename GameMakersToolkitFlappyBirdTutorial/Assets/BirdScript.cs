@@ -1,3 +1,4 @@
+using Assets;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -61,8 +62,7 @@ public class BirdScript : MonoBehaviour
         {
             _isAlive = false;
 
-            _audioSource.clip = DeathSoundEffect;
-            _audioSource.Play();
+            _audioSource.PlayClip(DeathSoundEffect);
             
             LogicManager.TriggerGameOver();
         }
