@@ -19,6 +19,10 @@ public class BirdScript : MonoBehaviour
     [Tooltip("Determines how high the Bird character can go before it cannot be controlled.")]
     public float ControlCeiling = 6.5f;
 
+    private AudioSource _audioSource;
+    [Tooltip("The sound effect clip to be played on death.")]
+    public AudioClip DeathSoundEffect;
+
     private bool _isAlive = true;
 
     // Start is called before the first frame update
@@ -26,7 +30,10 @@ public class BirdScript : MonoBehaviour
     {
         Debug.Assert(BirdPhysics != null, "'BirdPhysics' Rigidbody2D not assigned!");
         Debug.Assert(LogicManager != null, "'LogicManager' LogicManagerScript not assigned!");
+        Debug.Assert(DeathSoundEffect != null, "'DeathSoundEffect' AudioClip not assigned!");
         Debug.Assert(flapStrength > 0, "'flapStrength' must be greater than 0!");
+        _audioSource = GetComponent<AudioSource>();
+        Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
     }
 
     // Update is called once per frame
@@ -50,7 +57,14 @@ public class BirdScript : MonoBehaviour
 
     private void BecomeDead()
     {
-        _isAlive = false;
-        LogicManager.TriggerGameOver();
+        if(_isAlive)
+        {
+            _isAlive = false;
+
+            _audioSource.clip = DeathSoundEffect;
+            _audioSource.Play();
+            
+            LogicManager.TriggerGameOver();
+        }
     }
 }
