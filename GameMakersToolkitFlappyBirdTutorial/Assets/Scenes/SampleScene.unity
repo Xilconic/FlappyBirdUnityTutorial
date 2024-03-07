@@ -567,6 +567,7 @@ MonoBehaviour:
   KillFloorDepth: -6.5
   ControlCeiling: 6.5
   DeathSoundEffect: {fileID: 8300000, guid: 0681cd24e6fa6cc4fa47abdc6fc9b899, type: 3}
+  FlapSoundEffect: {fileID: 8300000, guid: 28c8bbcd5778bb84f9d9535e76aa1b03, type: 3}
 --- !u!82 &520051555
 AudioSource:
   m_ObjectHideFlags: 0

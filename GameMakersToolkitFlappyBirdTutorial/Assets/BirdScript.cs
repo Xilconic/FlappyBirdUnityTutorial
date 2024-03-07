@@ -23,6 +23,8 @@ public class BirdScript : MonoBehaviour
     private AudioSource _audioSource;
     [Tooltip("The sound effect clip to be played on death.")]
     public AudioClip DeathSoundEffect;
+    [Tooltip("The sound effect clip to be played when flapping.")]
+    public AudioClip FlapSoundEffect;
 
     private bool _isAlive = true;
 
@@ -32,6 +34,7 @@ public class BirdScript : MonoBehaviour
         Debug.Assert(BirdPhysics != null, "'BirdPhysics' Rigidbody2D not assigned!");
         Debug.Assert(LogicManager != null, "'LogicManager' LogicManagerScript not assigned!");
         Debug.Assert(DeathSoundEffect != null, "'DeathSoundEffect' AudioClip not assigned!");
+        Debug.Assert(FlapSoundEffect != null, "'FlapSoundEffect' AudioClip not assigned!");
         Debug.Assert(flapStrength > 0, "'flapStrength' must be greater than 0!");
         _audioSource = GetComponent<AudioSource>();
         Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
@@ -42,6 +45,7 @@ public class BirdScript : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space) && _isAlive && transform.position.y <= ControlCeiling) 
         {
+            _audioSource.PlayClip(FlapSoundEffect);
             BirdPhysics.velocity = Vector3.up * flapStrength;
         }
 
