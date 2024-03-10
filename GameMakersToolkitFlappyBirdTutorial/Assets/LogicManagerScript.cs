@@ -56,7 +56,7 @@ public class LogicManagerScript : MonoBehaviour
         }
 
         _score++;
-        ScoreUI.text = _score.ToString();
+        ScoreUI.UpdateText(_score);
     }
 
     [ContextMenu("Restart Game")]
@@ -79,6 +79,6 @@ public class LogicManagerScript : MonoBehaviour
 
     private void UpdateHighScoreUI()
     {
-        HighScoreUI.text = _saveData.HighScore.ToString();
+        HighScoreUI.UpdateText(_saveData.HighScore);
     }
 }
