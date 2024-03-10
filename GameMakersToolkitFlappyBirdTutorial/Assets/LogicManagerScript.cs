@@ -46,7 +46,7 @@ public class LogicManagerScript : MonoBehaviour
     [ContextMenu("Increase Score")]
     public void IncrementScore()
     {
-        if(_score > _saveData.HighScore)
+        if(_saveData.IsBeatingHighScore(_score))
         {
             _audioSource.PlayClip(HighScoreSoundEffect);
         }
@@ -54,7 +54,6 @@ public class LogicManagerScript : MonoBehaviour
         {
             _audioSource.PlayClip(GainPointSoundEffect);
         }
-        
 
         _score++;
         ScoreUI.text = _score.ToString();
@@ -70,7 +69,7 @@ public class LogicManagerScript : MonoBehaviour
     public void TriggerGameOver()
     {
         GameOverScreen.SetActive(true);
-        if (_saveData.HighScore < _score)
+        if (_saveData.IsBeatingHighScore(_score))
         {
             _saveData.HighScore = _score;
             UpdateHighScoreUI();

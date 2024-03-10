@@ -11,6 +11,11 @@ namespace Assets
 
         public int HighScore = 0;
 
+        public bool IsBeatingHighScore(int score)
+        {
+            return score > HighScore;
+        }
+
         /// <exception cref="UnableToSaveSaveDataException"/>
         public void Save()
         {
