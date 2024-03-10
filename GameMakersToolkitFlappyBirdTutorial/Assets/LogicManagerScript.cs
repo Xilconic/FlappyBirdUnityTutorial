@@ -14,6 +14,8 @@ public class LogicManagerScript : MonoBehaviour
     public GameObject GameOverScreen;
     [Tooltip("The sound effect to be played when a point is gained.")]
     public AudioClip GainPointSoundEffect;
+    [Tooltip("The sound effect to be played when high score is improved.")]
+    public AudioClip HighScoreSoundEffect;
 
     private AudioSource _audioSource;
 
@@ -44,7 +46,15 @@ public class LogicManagerScript : MonoBehaviour
     [ContextMenu("Increase Score")]
     public void IncrementScore()
     {
-        _audioSource.PlayClip(GainPointSoundEffect);
+        if(_score > _saveData.HighScore)
+        {
+            _audioSource.PlayClip(HighScoreSoundEffect);
+        }
+        else
+        {
+            _audioSource.PlayClip(GainPointSoundEffect);
+        }
+        
 
         _score++;
         ScoreUI.text = _score.ToString();

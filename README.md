@@ -6,7 +6,8 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [RPG Essentals SFX Free](https://leohpaz.itch.io/rpg-essentials-sfx-free)
   - On flap: `30_Jump_03.wav`
   - On death: `52_Dive_02.wav`
-  - On gain point: `013_Confirm_03.wav`
+  - On gain point: `001_Hover_01.wav`
+  - On break record: `013_Confirm_03.wav`
   
 ### Background music
 - [Beach - by Sakura Girl](https://soundcloud.com/sakuragirl_official/beach)

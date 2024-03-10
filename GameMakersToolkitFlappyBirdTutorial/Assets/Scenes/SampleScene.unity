@@ -1174,7 +1174,8 @@ MonoBehaviour:
   ScoreUI: {fileID: 296380384}
   HighScoreUI: {fileID: 18731724}
   GameOverScreen: {fileID: 1507379981}
-  GainPointSoundEffect: {fileID: 8300000, guid: 0655567d923a16b4395305a926c98330, type: 3}
+  GainPointSoundEffect: {fileID: 8300000, guid: d79fd44b94928fc42804ae8cb234ca0a, type: 3}
+  HighScoreSoundEffect: {fileID: 8300000, guid: 0655567d923a16b4395305a926c98330, type: 3}
 --- !u!4 &1586286741
 Transform:
   m_ObjectHideFlags: 0
