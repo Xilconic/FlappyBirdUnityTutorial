@@ -460,7 +460,7 @@ GameObject:
   - component: {fileID: 1136836758}
   - component: {fileID: 1136836757}
   m_Layer: 5
-  m_Name: Text (Legacy)
+  m_Name: LegalAndCreditsText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
