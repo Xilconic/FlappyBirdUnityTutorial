@@ -21,8 +21,14 @@ public class ObstaclePassDetectorScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player")) {
-            _logicManagerScript.IncrementScore();
+        if(collision.gameObject.CompareTag("Player")) 
+        {
+            var bird = collision.gameObject.GetComponent<BirdScript>();
+            Debug.Assert(bird != null, "Colided GameObject tagged 'Player' should have a 'BirdScript'.");
+            if (bird.IsAlive)
+            {
+                _logicManagerScript.IncrementScore();
+            }
         }
     }
 }

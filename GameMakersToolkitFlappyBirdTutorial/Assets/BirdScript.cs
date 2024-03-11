@@ -26,7 +26,7 @@ public class BirdScript : MonoBehaviour
     [Tooltip("The sound effect clip to be played when flapping.")]
     public AudioClip FlapSoundEffect;
 
-    private bool _isAlive = true;
+    public bool IsAlive {  get; private set; } = true;
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +43,7 @@ public class BirdScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && _isAlive && transform.position.y <= ControlCeiling) 
+        if(Input.GetKeyDown(KeyCode.Space) && IsAlive && transform.position.y <= ControlCeiling) 
         {
             _audioSource.PlayClip(FlapSoundEffect);
             BirdPhysics.velocity = Vector3.up * flapStrength;
@@ -62,9 +62,9 @@ public class BirdScript : MonoBehaviour
 
     private void BecomeDead()
     {
-        if(_isAlive)
+        if(IsAlive)
         {
-            _isAlive = false;
+            IsAlive = false;
 
             _audioSource.PlayClip(DeathSoundEffect);
             
