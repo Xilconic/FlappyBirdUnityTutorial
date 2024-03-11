@@ -18,6 +18,10 @@ public class LogicManagerScript : MonoBehaviour
     public AudioClip HighScoreSoundEffect;
 
     private AudioSource _audioSource;
+    /// <remarks>
+    /// This field can be null, in case the scene does not have a background music.
+    /// </remarks>
+    private BackgroundMusicScript _backGroundMusicScript;
 
     private int _score = 0;
     private SaveData _saveData = new();
@@ -30,6 +34,14 @@ public class LogicManagerScript : MonoBehaviour
         Debug.Assert(GameOverScreen != null, "'GameOverScreen' is not set to a GameObject!");
         _audioSource = GetComponent<AudioSource>();
         Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
+
+        var backGroundMusic = GameObject.FindGameObjectWithTag("BackgroundMusic");
+        if(backGroundMusic != null)
+        {
+            _backGroundMusicScript = backGroundMusic.GetComponent<BackgroundMusicScript>();
+            Debug.Assert(_backGroundMusicScript != null, "'BackgroundMusicScript' cannot be found as component of GameObject tagged 'BackgroundMusic'.");
+        }
+
         try
         {
             _saveData = SaveData.Load();
@@ -62,6 +74,11 @@ public class LogicManagerScript : MonoBehaviour
     [ContextMenu("Restart Game")]
     public void RestartGame()
     {
+        if(_backGroundMusicScript != null)
+        {
+            _backGroundMusicScript.TargetPitch = 1.0f;
+        }
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -69,6 +86,12 @@ public class LogicManagerScript : MonoBehaviour
     public void TriggerGameOver()
     {
         GameOverScreen.SetActive(true);
+
+        if(_backGroundMusicScript != null)
+        {
+            _backGroundMusicScript.TargetPitch = 0.8f;
+        }
+        
         if (_saveData.IsBeatingHighScore(_score))
         {
             _saveData.HighScore = _score;
