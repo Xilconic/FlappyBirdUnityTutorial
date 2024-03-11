@@ -26,6 +26,9 @@ public class BirdScript : MonoBehaviour
     [Tooltip("The sound effect clip to be played when flapping.")]
     public AudioClip FlapSoundEffect;
 
+    [Tooltip("The hitspark effect played when player hits an obstacle")]
+    public GameObject HitSpark;
+
     public bool IsAlive {  get; private set; } = true;
 
     // Start is called before the first frame update
@@ -38,6 +41,7 @@ public class BirdScript : MonoBehaviour
         Debug.Assert(flapStrength > 0, "'flapStrength' must be greater than 0!");
         _audioSource = GetComponent<AudioSource>();
         Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
+        Debug.Assert(HitSpark != null, "'HitSpark' GameObject not assigned.");
     }
 
     // Update is called once per frame
@@ -65,6 +69,8 @@ public class BirdScript : MonoBehaviour
         if(IsAlive)
         {
             IsAlive = false;
+
+            Instantiate(HitSpark, transform); // Not particularly great looking :(
 
             _audioSource.PlayClip(DeathSoundEffect);
             
