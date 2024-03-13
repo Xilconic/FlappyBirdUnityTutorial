@@ -5,8 +5,12 @@ using UnityEngine;
 
 public class BirdScript : MonoBehaviour
 {
+    private AudioSource _audioSource;
+
     [Tooltip("Required 2D physics of the Bird character.")]
     public Rigidbody2D BirdPhysics;
+    [Tooltip("Required 2D hurtbox of the Bird character.")]
+    public Collider2D BirdHurtBox;
 
     [Tooltip("Enables tweaking the strength of the wing-flap of the Bird, when pressing Space.")]
     public float flapStrength = 10;
@@ -16,21 +20,24 @@ public class BirdScript : MonoBehaviour
 
     [Tooltip("Determines how deep the Bird character can go before it automatically dies.")]
     public float KillFloorDepth = -6.5f;
-
     [Tooltip("Determines how high the Bird character can go before it cannot be controlled.")]
     public float ControlCeiling = 6.5f;
 
-    private AudioSource _audioSource;
     [Tooltip("The sound effect clip to be played on death.")]
     public AudioClip DeathSoundEffect;
     [Tooltip("The sound effect clip to be played when flapping.")]
     public AudioClip FlapSoundEffect;
 
-    [Tooltip("The hitspark effect played when player hits an obstacle")]
+    [Tooltip("The hitspark effect played when player hits an obstacle.")]
     public GameObject HitSpark;
 
-    [Tooltip("The animator for the Bird")]
+    [Tooltip("The animator for the Bird.")]
     public Animator Animator;
+
+    [Tooltip("Determines how much bounceback the bird gets on death.")]
+    public float BounceBackStrength = 8f;
+    [Tooltip("Determines how much angular velocity the bird gets on death. (Positive Value is counterclockwise rotation)")]
+    public float BounceBackAngularVelocity = 180f;
 
     public bool IsAlive {  get; private set; } = true;
 
@@ -46,6 +53,7 @@ public class BirdScript : MonoBehaviour
         Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
         Debug.Assert(HitSpark != null, "'HitSpark' GameObject not assigned.");
         Debug.Assert(Animator != null, "'Animator' Animator not assigned!");
+        Debug.Assert(BirdHurtBox != null, "'BirdHurtBox' Collider2D not assigned!");
     }
 
     // Update is called once per frame
@@ -74,6 +82,10 @@ public class BirdScript : MonoBehaviour
         if(IsAlive)
         {
             IsAlive = false;
+
+            BirdPhysics.velocity = Vector3.left * BounceBackStrength;
+            BirdPhysics.angularVelocity = BounceBackAngularVelocity;
+            BirdHurtBox.enabled = false; // Disable hurtbox; This prevents the bird from akwardly rolling on top of the obstacle.
 
             Instantiate(HitSpark, transform); // Not particularly great looking :(
 
