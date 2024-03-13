@@ -53,15 +53,9 @@ public class BirdScript : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space) && IsAlive && transform.position.y <= ControlCeiling) 
         {
-            Animator.SetBool("IsFlappingWing", true);
+            Animator.SetTrigger("FlapsWing");
             _audioSource.PlayClip(FlapSoundEffect);
             BirdPhysics.velocity = Vector3.up * flapStrength;
-        }
-
-        if(IsAlive && BirdPhysics.velocity.y <= 0.0f)
-        {
-            // Bird has reached apex or is falling:
-            Animator.SetBool("IsFlappingWing", false);
         }
 
         if(transform.position.y < KillFloorDepth)
