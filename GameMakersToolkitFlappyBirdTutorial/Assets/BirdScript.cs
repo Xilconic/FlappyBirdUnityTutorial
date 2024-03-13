@@ -29,6 +29,9 @@ public class BirdScript : MonoBehaviour
     [Tooltip("The hitspark effect played when player hits an obstacle")]
     public GameObject HitSpark;
 
+    [Tooltip("The animator for the Bird")]
+    public Animator Animator;
+
     public bool IsAlive {  get; private set; } = true;
 
     // Start is called before the first frame update
@@ -42,6 +45,7 @@ public class BirdScript : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         Debug.Assert(_audioSource != null, "'AudioSource' cannot be found as component!");
         Debug.Assert(HitSpark != null, "'HitSpark' GameObject not assigned.");
+        Debug.Assert(Animator != null, "'Animator' Animator not assigned!");
     }
 
     // Update is called once per frame
@@ -49,8 +53,15 @@ public class BirdScript : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space) && IsAlive && transform.position.y <= ControlCeiling) 
         {
+            Animator.SetBool("IsFlappingWing", true);
             _audioSource.PlayClip(FlapSoundEffect);
             BirdPhysics.velocity = Vector3.up * flapStrength;
+        }
+
+        if(IsAlive && BirdPhysics.velocity.y <= 0.0f)
+        {
+            // Bird has reached apex or is falling:
+            Animator.SetBool("IsFlappingWing", false);
         }
 
         if(transform.position.y < KillFloorDepth)

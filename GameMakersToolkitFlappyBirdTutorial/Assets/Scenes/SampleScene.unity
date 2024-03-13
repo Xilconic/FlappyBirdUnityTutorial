@@ -5403,6 +5403,7 @@ GameObject:
   - component: {fileID: 520051553}
   - component: {fileID: 520051554}
   - component: {fileID: 520051555}
+  - component: {fileID: 520051556}
   m_Layer: 0
   m_Name: Bird
   m_TagString: Player
@@ -5559,6 +5560,7 @@ MonoBehaviour:
   DeathSoundEffect: {fileID: 8300000, guid: 0681cd24e6fa6cc4fa47abdc6fc9b899, type: 3}
   FlapSoundEffect: {fileID: 8300000, guid: 28c8bbcd5778bb84f9d9535e76aa1b03, type: 3}
   HitSpark: {fileID: 6646566864394229864, guid: 87e6a26f81142dc4ba47b4bef48fce3d, type: 3}
+  Animator: {fileID: 520051556}
 --- !u!82 &520051555
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5655,6 +5657,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &520051556
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520051549}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d639173204f5e194993b20c8d79fe117, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &739859373
 GameObject:
   m_ObjectHideFlags: 0
