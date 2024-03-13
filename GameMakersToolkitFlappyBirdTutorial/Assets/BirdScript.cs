@@ -83,6 +83,8 @@ public class BirdScript : MonoBehaviour
         {
             IsAlive = false;
 
+            Animator.SetBool("IsBirdAlive", false);
+
             BirdPhysics.velocity = Vector3.left * BounceBackStrength;
             BirdPhysics.angularVelocity = BounceBackAngularVelocity;
             BirdHurtBox.enabled = false; // Disable hurtbox; This prevents the bird from akwardly rolling on top of the obstacle.
