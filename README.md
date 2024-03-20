@@ -24,7 +24,8 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 1. Open `NukeBuild\_build.csproj` in Visual Studio
 2. Open the `Build.cs` file, find the `SetVersion` Target and update the hardcoded version string.
 3. Open commandline in repository root.
-4. Run `nuke --target SetVersion`
+4. Run `nuke --target SetVersion --Version x.y.z`
+	- The `Version` parameter can optionally be post-fixes with -alpha or -beta
 
 ### Windows (build script)
 1. Open commandline in repository root.

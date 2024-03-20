@@ -19,6 +19,8 @@ partial class Build : NukeBuild
 {
     private static AbsolutePath _unityGameSrcDirecetory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
 
+    [Parameter] readonly string Version;
+
     public static int Main () => Execute<Build>();
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -42,19 +44,20 @@ partial class Build : NukeBuild
         });
 
     Target SetVersion => _ => _
+        .Requires(() => Version)
         .Executes(() =>
         {
-            const string versionText = "0.4.0-beta"; // TODO: Make this a required argument?
+            Assert.True(GetValidVersionRegex().IsMatch(Version), "The 'Version' Parameter needs to be in the 'SemVer' fomat of x.y.z, with optionally -alpha or -beta postfix.");
 
             var projectSettingsFile = _unityGameSrcDirecetory / "ProjectSettings" / "ProjectSettings.asset";
             // Match to `  bundleVersion: x.y.z-alpha` or `  bundleVersion: x.y.z-beta` or `  bundleVersion: x.y.z`:
             Regex projectSettingsVersionRegex = GetProjectSettingsVersionRegex();
-            UpdateVersionTextInFileUsingRegex(versionText, projectSettingsFile, projectSettingsVersionRegex, "bundleVersion: <version>");
+            UpdateVersionTextInFileUsingRegex(Version!, projectSettingsFile, projectSettingsVersionRegex, "bundleVersion: <version>");
                 
             var mainMenuSceneFile = _unityGameSrcDirecetory / "Assets" / "Scenes" / "MainMenuScene.unity";
             // Match to `  m_Text: 'Version: x.y.z-alpha'` or `  m_Text: 'Version: x.y.z-beta'` or `  m_Text: 'Version: x.y.z'`:
             var mainMenuSceneVersionTextValueRegex = GetMainMenuSceneVersionTextValueRegex();
-            UpdateVersionTextInFileUsingRegex(versionText, mainMenuSceneFile, mainMenuSceneVersionTextValueRegex, "m_Text: 'Version: <version>'");
+            UpdateVersionTextInFileUsingRegex(Version!, mainMenuSceneFile, mainMenuSceneVersionTextValueRegex, "m_Text: 'Version: <version>'");
         });
 
     Target BuildAppAsWin64bit => _ => _
@@ -101,4 +104,6 @@ partial class Build : NukeBuild
     private static partial Regex GetProjectSettingsVersionRegex();
     [GeneratedRegex("^\\s+m_Text:\\s+'Version: (?<currentVersion>\\d+\\.\\d+\\.\\d+(-(alpha|beta))?)'$")]
     private static partial Regex GetMainMenuSceneVersionTextValueRegex();
+    [GeneratedRegex("^\\d+\\.\\d+\\.\\d+(-(alpha|beta))?$")]
+    private static partial Regex GetValidVersionRegex();
 }
