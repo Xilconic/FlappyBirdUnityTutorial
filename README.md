@@ -21,7 +21,9 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [Nuke](https://nuke.build/docs/introduction/) v8.0.0 (Installed from commandline: `dotnet tool install Nuke.GlobalTool --global`)
 
 ### Windwos (build script)
-
+1. Open commandline in repository root.
+2. Run `nuke --target BuildAppAsWin64bit`.
+3. Build can be found in `<repo root>\Builds\win64`.
 
 ### Windows (manual)
 1. From repository root, open `GameMakersToolkitFlappyBirdTutorial` folder.
