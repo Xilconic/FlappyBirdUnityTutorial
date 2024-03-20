@@ -18,6 +18,10 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [Visual Studio](https://visualstudio.microsoft.com/vs/community/) v17.9.2
 	- With "Game development with Unity" extension
 - [Python](https://www.python.org/downloads/) v3.12.2
+- [Nuke](https://nuke.build/docs/introduction/) v8.0.0 (Installed from commandline: `dotnet tool install Nuke.GlobalTool --global`)
+
+### Windwos (build script)
+
 
 ### Windows (manual)
 1. From repository root, open `GameMakersToolkitFlappyBirdTutorial` folder.
