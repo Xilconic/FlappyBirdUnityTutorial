@@ -20,7 +20,13 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [Python](https://www.python.org/downloads/) v3.12.2
 - [Nuke](https://nuke.build/docs/introduction/) v8.0.0 (Installed from commandline: `dotnet tool install Nuke.GlobalTool --global`)
 
-### Windwos (build script)
+### Updating app version
+1. Open `NukeBuild\_build.csproj` in Visual Studio
+2. Open the `Build.cs` file, find the `SetVersion` Target and update the hardcoded version string.
+3. Open commandline in repository root.
+4. Run `nuke --target SetVersion`
+
+### Windows (build script)
 1. Open commandline in repository root.
 2. Run `nuke --target BuildAppAsWin64bit`.
 3. Build can be found in `<repo root>\Builds\win64`.

@@ -75,7 +75,8 @@
               "BuildAppAsWin64bit",
               "Clean",
               "Compile",
-              "Restore"
+              "Restore",
+              "SetVersion"
             ]
           }
         },
@@ -88,7 +89,8 @@
               "BuildAppAsWin64bit",
               "Clean",
               "Compile",
-              "Restore"
+              "Restore",
+              "SetVersion"
             ]
           }
         },
