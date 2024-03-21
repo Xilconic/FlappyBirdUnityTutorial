@@ -17,7 +17,10 @@ using Serilog;
 
 partial class Build : NukeBuild
 {
-    private static AbsolutePath _unityGameSrcDirecetory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
+    private const string AppName = "GameMakersToolkitFlappyBirdTutorial";
+
+    private static AbsolutePath _unityGameSrcDirectory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
+    private static AbsolutePath _winx64BuildDirectory = RootDirectory / "Builds" / "winx64";
 
     [Parameter] readonly string Version;
 
@@ -49,12 +52,12 @@ partial class Build : NukeBuild
         {
             Assert.True(GetValidVersionRegex().IsMatch(Version), "The 'Version' Parameter needs to be in the 'SemVer' fomat of x.y.z, with optionally -alpha or -beta postfix.");
 
-            var projectSettingsFile = _unityGameSrcDirecetory / "ProjectSettings" / "ProjectSettings.asset";
+            var projectSettingsFile = _unityGameSrcDirectory / "ProjectSettings" / "ProjectSettings.asset";
             // Match to `  bundleVersion: x.y.z-alpha` or `  bundleVersion: x.y.z-beta` or `  bundleVersion: x.y.z`:
             Regex projectSettingsVersionRegex = GetProjectSettingsVersionRegex();
             UpdateVersionTextInFileUsingRegex(Version!, projectSettingsFile, projectSettingsVersionRegex, "bundleVersion: <version>");
                 
-            var mainMenuSceneFile = _unityGameSrcDirecetory / "Assets" / "Scenes" / "MainMenuScene.unity";
+            var mainMenuSceneFile = _unityGameSrcDirectory / "Assets" / "Scenes" / "MainMenuScene.unity";
             // Match to `  m_Text: 'Version: x.y.z-alpha'` or `  m_Text: 'Version: x.y.z-beta'` or `  m_Text: 'Version: x.y.z'`:
             var mainMenuSceneVersionTextValueRegex = GetMainMenuSceneVersionTextValueRegex();
             UpdateVersionTextInFileUsingRegex(Version!, mainMenuSceneFile, mainMenuSceneVersionTextValueRegex, "m_Text: 'Version: <version>'");
@@ -63,16 +66,37 @@ partial class Build : NukeBuild
     Target BuildAppAsWin64bit => _ => _
         .Executes(() =>
         {
-            var buildDirectory = RootDirectory / "Builds" / "winx64" / "GameMakersToolkitFlappyBirdTutorial.exe";
-            UnityTasks.Unity(unitySettings => unitySettings
-                .SetQuit(true)
-                .SetBatchMode(true)
-                .SetBuildTarget(UnityBuildTarget.StandaloneWindows64)
-                .SetBuildWindows64Player(buildDirectory)
-                .SetProjectPath(_unityGameSrcDirecetory)
-                .SetLogFile(RootDirectory / "NukeBuild" / "unity.log")
-            );
+            var targetAppFileLocation = _winx64BuildDirectory / $"{AppName}.exe";
+            BuildWin64BitInTargetDirectory(targetAppFileLocation);
         });
+
+    Target BuildWin64BitReleaseBinaries => _ => _
+        .DependsOn(SetVersion)
+        .Executes(() =>
+        {
+            var releaseVersion = $"{AppName}_winx64_{Version}";
+            var targetAppFileLocation = _winx64BuildDirectory / releaseVersion / $"{AppName}.exe";
+            BuildWin64BitInTargetDirectory(targetAppFileLocation, true);
+        });
+
+    private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
+    {
+        UnityTasks.Unity(unitySettings =>
+        {
+            UnitySettings settings = unitySettings
+                .EnableQuit()
+                .EnableBatchMode()
+                .SetBuildTarget(UnityBuildTarget.StandaloneWindows64)
+                .SetBuildWindows64Player(targetAppFileLocation)
+                .SetProjectPath(_unityGameSrcDirectory)
+                .SetLogFile(RootDirectory / "NukeBuild" / "unity.log");
+            if (isReleaseBuild)
+            {
+                settings.AddCustomArguments("-releaseCodeOptimization");
+            }
+            return settings;
+        });
+    }
 
     private static void UpdateVersionTextInFileUsingRegex(string versionText, AbsolutePath fileToBeUpdated, Regex regex, string expectedPattern)
     {
