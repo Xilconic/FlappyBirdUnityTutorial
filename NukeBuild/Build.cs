@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
 using Nuke.Common;
 using Nuke.Common.CI;
 using Nuke.Common.Execution;
@@ -19,15 +20,19 @@ partial class Build : NukeBuild
 {
     private const string AppName = "GameMakersToolkitFlappyBirdTutorial";
 
-    private static AbsolutePath _unityGameSrcDirectory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
-    private static AbsolutePath _winx64BuildDirectory = RootDirectory / "Builds" / "winx64";
+    private static readonly AbsolutePath _unityGameSrcDirectory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
+    private static readonly AbsolutePath _winx64BuildDirectory = RootDirectory / "Builds" / "winx64";
 
-    [Parameter] readonly string Version;
-
-    public static int Main () => Execute<Build>();
+    [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
+    readonly string Version;
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+
+    private AbsolutePath _targetAppFileLocation;
+    private string _releaseVersion;
+
+    public static int Main() => Execute<Build>();
 
     Target Clean => _ => _
         .Before(Restore)
@@ -72,11 +77,24 @@ partial class Build : NukeBuild
 
     Target BuildWin64BitReleaseBinaries => _ => _
         .DependsOn(SetVersion)
+        .Unlisted()
         .Executes(() =>
         {
-            var releaseVersion = $"{AppName}_winx64_{Version}";
-            var targetAppFileLocation = _winx64BuildDirectory / releaseVersion / $"{AppName}.exe";
-            BuildWin64BitInTargetDirectory(targetAppFileLocation, true);
+            _releaseVersion = $"{AppName}_winx64_{Version}";
+            _targetAppFileLocation = _winx64BuildDirectory / _releaseVersion / $"{AppName}.exe";
+            BuildWin64BitInTargetDirectory(_targetAppFileLocation, true);
+            
+        });
+
+    Target BuildWin64BitReleaseZipFile => _ => _
+        .DependsOn(BuildWin64BitReleaseBinaries)
+        .Executes(() =>
+        {
+            AbsolutePath releaseBinariesDirectory = _targetAppFileLocation.Parent;
+            releaseBinariesDirectory.ZipTo(
+                releaseBinariesDirectory + ".zip", 
+                compressionLevel: CompressionLevel.SmallestSize
+            );
         });
 
     private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)

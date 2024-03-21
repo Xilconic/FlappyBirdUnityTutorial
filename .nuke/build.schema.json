@@ -74,6 +74,7 @@
             "enum": [
               "BuildAppAsWin64bit",
               "BuildWin64BitReleaseBinaries",
+              "BuildWin64BitReleaseZipFile",
               "Clean",
               "Compile",
               "Restore",
@@ -89,6 +90,7 @@
             "enum": [
               "BuildAppAsWin64bit",
               "BuildWin64BitReleaseBinaries",
+              "BuildWin64BitReleaseZipFile",
               "Clean",
               "Compile",
               "Restore",
@@ -107,7 +109,8 @@
           ]
         },
         "Version": {
-          "type": "string"
+          "type": "string",
+          "description": "The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta"
         }
       }
     }

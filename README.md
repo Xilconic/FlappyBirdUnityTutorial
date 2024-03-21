@@ -22,18 +22,21 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 
 ### Building a Windows Release (build script)
 1. Open commandline in repository root.
-2. Run `nuke --target SetVersion --Version x.y.z`
+2. Run `nuke --target BuildWin64BitReleaseZipFile --Version x.y.z`
 	- The `Version` parameter can optionally be post-fixed with -alpha or -beta
+	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
+3. The zip-file can be found in `<repo root>\Builds\winx64`
 
 ### Updating app version
 1. Open commandline in repository root.
-2. Run `nuke --target BuildWin64BitReleaseBinaries --Version x.y.z`
+2. Run `nuke --target SetVersion --Version x.y.z`
 	- The `Version` parameter can optionally be post-fixed with -alpha or -beta
+	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
 
 ### Windows (build script)
 1. Open commandline in repository root.
 2. Run `nuke --target BuildAppAsWin64bit`.
-3. Build can be found in `<repo root>\Builds\win64`.
+3. Build can be found in `<repo root>\Builds\winx64`.
 
 ### Windows (manual)
 1. From repository root, open `GameMakersToolkitFlappyBirdTutorial` folder.
