@@ -17,6 +17,11 @@ using System.Text.RegularExpressions;
 using Serilog;
 using Nuke.Common.Git;
 using Nuke.Common.Tools.Git;
+using Nuke.Common.Tools.GitHub;
+using Octokit;
+using _build;
+using System.Collections.Generic;
+using System.Net.Mime;
 
 partial class Build : NukeBuild
 {
@@ -27,12 +32,21 @@ partial class Build : NukeBuild
     private static readonly AbsolutePath _winx64BuildDirectory = _buildsDirectory / "winx64";
     private static readonly AbsolutePath _winx86BuildDirectory = _buildsDirectory / "winx86";
 
+    [GitRepository] readonly GitRepository Repository;
+
     [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
     readonly string Version;
 
-    [GitRepository] readonly GitRepository Repository;
+    [Parameter("The password for Github"), Secret] 
+    readonly string GitHubPassword;
 
-    private AbsolutePath _targetAppFileLocation;
+    [Parameter("The username for Github")]
+    readonly string GitHubUser;
+
+    [Parameter("The 'Personal Access Token' used by the Build scripts for creating releases"), Secret]
+    readonly string GitHubPersonalAccessToken;
+
+    private readonly Dictionary<ReleaseTypes, AbsolutePath> _targetAppFileLocations = new();
     private string _releaseVersion;
 
     public static int Main() => Execute<Build>();
@@ -75,8 +89,8 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             _releaseVersion = $"{AppName}_winx64_{Version}";
-            _targetAppFileLocation = _winx64BuildDirectory / _releaseVersion / $"{AppName}.exe";
-            BuildWin64BitInTargetDirectory(_targetAppFileLocation, true);
+            _targetAppFileLocations[ReleaseTypes.Windows64Bit] = _winx64BuildDirectory / _releaseVersion / $"{AppName}.exe";
+            BuildWin64BitInTargetDirectory(_targetAppFileLocations[ReleaseTypes.Windows64Bit], true);
             
         });
 
@@ -86,8 +100,8 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             _releaseVersion = $"{AppName}_winx86_{Version}";
-            _targetAppFileLocation = _winx86BuildDirectory / _releaseVersion / $"{AppName}.exe";
-            BuildWin32BitInTargetDirectory(_targetAppFileLocation, true);
+            _targetAppFileLocations[ReleaseTypes.Windows32Bit] = _winx86BuildDirectory / _releaseVersion / $"{AppName}.exe";
+            BuildWin32BitInTargetDirectory(_targetAppFileLocations[ReleaseTypes.Windows32Bit], true);
 
         });
 
@@ -95,22 +109,14 @@ partial class Build : NukeBuild
         .DependsOn(BuildWin64BitReleaseBinaries)
         .Executes(() =>
         {
-            AbsolutePath releaseBinariesDirectory = _targetAppFileLocation.Parent;
-            releaseBinariesDirectory.ZipTo(
-                releaseBinariesDirectory + ".zip", 
-                compressionLevel: CompressionLevel.SmallestSize
-            );
+            ZipRelease(ReleaseTypes.Windows64Bit);
         });
 
     Target BuildWin32BitReleaseZipFile => _ => _
         .DependsOn(BuildWin32BitReleaseBinaries)
         .Executes(() =>
         {
-            AbsolutePath releaseBinariesDirectory = _targetAppFileLocation.Parent;
-            releaseBinariesDirectory.ZipTo(
-                releaseBinariesDirectory + ".zip",
-                compressionLevel: CompressionLevel.SmallestSize
-            );
+            ZipRelease(ReleaseTypes.Windows32Bit);
         });
 
     Target CreateReleaseCommitAndPush => _ => _
@@ -129,6 +135,55 @@ partial class Build : NukeBuild
 
             // Push to origin:
             GitTasks.Git("push origin --tags main:main");
+        });
+
+    Target CreateReleaseOnGithub => _ => _
+        .Requires(() => Version)
+        //.Requires(() => GitHubUser)
+        //.Requires(() => GitHubPassword)
+        .Requires(() => GitHubPersonalAccessToken)
+        .DependsOn(CreateReleaseCommitAndPush)
+        .DependsOn(BuildWin64BitReleaseZipFile)
+        .DependsOn(BuildWin32BitReleaseZipFile)
+        .Executes(async () =>
+        {
+            string branchName = await GitHubTasks.GetDefaultBranch(Repository);
+            var productInformation = new ProductHeaderValue($"{AppName}-NukeBuildScript");
+            GitHubTasks.GitHubClient = new GitHubClient(productInformation)
+            {
+                //Credentials = new Credentials(GitHubUser, GitHubPassword)
+                Credentials = new Credentials(GitHubPersonalAccessToken)
+            };
+
+            var releaseData = new NewRelease(Version)
+            {
+                Prerelease = Version.EndsWith("alpha") || Version.EndsWith("beta"),
+                Body = "TODO"
+            };
+            try
+            {
+                Release release = await GitHubTasks.GitHubClient.Repository.Release
+                    .Create(Repository.GetGitHubOwner(), Repository.GetGitHubName(), releaseData);
+
+                foreach (ReleaseTypes releaseType in _targetAppFileLocations.Keys)
+                {
+                    AbsolutePath releaseArtifact = GetReleaseZipFilePath(releaseType);
+                    var upload = new ReleaseAssetUpload
+                    {
+                        ContentType = MediaTypeNames.Application.Zip,
+                        FileName = Path.GetFileName(releaseArtifact),
+                        RawData = File.OpenRead(releaseArtifact)
+                    };
+                    await GitHubTasks.GitHubClient.Repository.Release
+                                    .UploadAsset(release, upload);
+                }
+            }
+            catch (ApiException e)
+            {
+                Log.Debug("{@ExceptionData}", e);
+                Log.Error(e, "Failure during release creation towards Github");
+            }
+            
         });
 
     private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
@@ -192,6 +247,18 @@ partial class Build : NukeBuild
         fileToBeUpdated.WriteAllLines(fileLines);
         Log.Debug("Successfully updated {File} to {NewVersion}", fileToBeUpdated.ToString(), versionText);
     }
+
+    private void ZipRelease(ReleaseTypes release)
+    {
+        AbsolutePath archiveFile = GetReleaseZipFilePath(release);
+        AbsolutePath releaseDirectory = _targetAppFileLocations[release].Parent;
+        releaseDirectory.ZipTo(
+            archiveFile,
+            compressionLevel: CompressionLevel.SmallestSize
+        );
+    }
+
+    private AbsolutePath GetReleaseZipFilePath(ReleaseTypes win64BitRelease) => _targetAppFileLocations[win64BitRelease].Parent + ".zip";
 
     [GeneratedRegex("^\\s+bundleVersion:\\s+(?<currentVersion>\\d+\\.\\d+\\.\\d+(-(alpha|beta))?)$")]
     private static partial Regex GetProjectSettingsVersionRegex();
