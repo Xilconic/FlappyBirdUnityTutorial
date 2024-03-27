@@ -72,7 +72,10 @@
           "items": {
             "type": "string",
             "enum": [
+              "BuildAppAsWin32bit",
               "BuildAppAsWin64bit",
+              "BuildWin32BitReleaseBinaries",
+              "BuildWin32BitReleaseZipFile",
               "BuildWin64BitReleaseBinaries",
               "BuildWin64BitReleaseZipFile",
               "Clean",
@@ -88,7 +91,10 @@
           "items": {
             "type": "string",
             "enum": [
+              "BuildAppAsWin32bit",
               "BuildAppAsWin64bit",
+              "BuildWin32BitReleaseBinaries",
+              "BuildWin32BitReleaseZipFile",
               "BuildWin64BitReleaseBinaries",
               "BuildWin64BitReleaseZipFile",
               "Clean",

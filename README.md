@@ -21,6 +21,13 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [Nuke](https://nuke.build/docs/introduction/) v8.0.0 (Installed from commandline: `dotnet tool install Nuke.GlobalTool --global`)
 
 ### Building a Windows Release (build script)
+#### 32bit
+1. Open commandline in repository root.
+2. Run `nuke --target BuildWin32BitReleaseZipFile --Version x.y.z`
+	- The `Version` parameter can optionally be post-fixed with -alpha or -beta
+	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
+3. The zip-file can be found in `<repo root>\Builds\winx86`
+#### 64bit 
 1. Open commandline in repository root.
 2. Run `nuke --target BuildWin64BitReleaseZipFile --Version x.y.z`
 	- The `Version` parameter can optionally be post-fixed with -alpha or -beta
@@ -34,6 +41,11 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
 
 ### Windows (build script)
+#### 32bit
+1. Open commandline in repository root.
+2. Run `nuke --target BuildAppAsWin32bit`.
+3. Build can be found in `<repo root>\Builds\winx86`.
+#### 64bit
 1. Open commandline in repository root.
 2. Run `nuke --target BuildAppAsWin64bit`.
 3. Build can be found in `<repo root>\Builds\winx64`.

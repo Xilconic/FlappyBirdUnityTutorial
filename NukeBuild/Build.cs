@@ -21,7 +21,9 @@ partial class Build : NukeBuild
     private const string AppName = "GameMakersToolkitFlappyBirdTutorial";
 
     private static readonly AbsolutePath _unityGameSrcDirectory = RootDirectory / "GameMakersToolkitFlappyBirdTutorial";
-    private static readonly AbsolutePath _winx64BuildDirectory = RootDirectory / "Builds" / "winx64";
+    private static readonly AbsolutePath _buildsDirectory = RootDirectory / "Builds";
+    private static readonly AbsolutePath _winx64BuildDirectory = _buildsDirectory / "winx64";
+    private static readonly AbsolutePath _winx86BuildDirectory = _buildsDirectory / "winx86";
 
     [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
     readonly string Version;
@@ -75,6 +77,13 @@ partial class Build : NukeBuild
             BuildWin64BitInTargetDirectory(targetAppFileLocation);
         });
 
+    Target BuildAppAsWin32bit => _ => _
+        .Executes(() =>
+        {
+            var targetAppFileLocation = _winx86BuildDirectory / $"{AppName}.exe";
+            BuildWin32BitInTargetDirectory(targetAppFileLocation);
+        });
+
     Target BuildWin64BitReleaseBinaries => _ => _
         .DependsOn(SetVersion)
         .Unlisted()
@@ -84,6 +93,17 @@ partial class Build : NukeBuild
             _targetAppFileLocation = _winx64BuildDirectory / _releaseVersion / $"{AppName}.exe";
             BuildWin64BitInTargetDirectory(_targetAppFileLocation, true);
             
+        });
+
+    Target BuildWin32BitReleaseBinaries => _ => _
+        .DependsOn(SetVersion)
+        .Unlisted()
+        .Executes(() =>
+        {
+            _releaseVersion = $"{AppName}_winx86_{Version}";
+            _targetAppFileLocation = _winx86BuildDirectory / _releaseVersion / $"{AppName}.exe";
+            BuildWin32BitInTargetDirectory(_targetAppFileLocation, true);
+
         });
 
     Target BuildWin64BitReleaseZipFile => _ => _
@@ -97,6 +117,17 @@ partial class Build : NukeBuild
             );
         });
 
+    Target BuildWin32BitReleaseZipFile => _ => _
+        .DependsOn(BuildWin32BitReleaseBinaries)
+        .Executes(() =>
+        {
+            AbsolutePath releaseBinariesDirectory = _targetAppFileLocation.Parent;
+            releaseBinariesDirectory.ZipTo(
+                releaseBinariesDirectory + ".zip",
+                compressionLevel: CompressionLevel.SmallestSize
+            );
+        });
+
     private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
     {
         UnityTasks.Unity(unitySettings =>
@@ -106,6 +137,25 @@ partial class Build : NukeBuild
                 .EnableBatchMode()
                 .SetBuildTarget(UnityBuildTarget.StandaloneWindows64)
                 .SetBuildWindows64Player(targetAppFileLocation)
+                .SetProjectPath(_unityGameSrcDirectory)
+                .SetLogFile(RootDirectory / "NukeBuild" / "unity.log");
+            if (isReleaseBuild)
+            {
+                settings.AddCustomArguments("-releaseCodeOptimization");
+            }
+            return settings;
+        });
+    }
+
+    private static void BuildWin32BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
+    {
+        UnityTasks.Unity(unitySettings =>
+        {
+            UnitySettings settings = unitySettings
+                .EnableQuit()
+                .EnableBatchMode()
+                .SetBuildTarget(UnityBuildTarget.StandaloneWindows)
+                .SetBuildWindowsPlayer(targetAppFileLocation)
                 .SetProjectPath(_unityGameSrcDirectory)
                 .SetLogFile(RootDirectory / "NukeBuild" / "unity.log");
             if (isReleaseBuild)
