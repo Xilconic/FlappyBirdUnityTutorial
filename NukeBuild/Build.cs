@@ -15,6 +15,8 @@ using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using System.Text.RegularExpressions;
 using Serilog;
+using Nuke.Common.Git;
+using Nuke.Common.Tools.Git;
 
 partial class Build : NukeBuild
 {
@@ -28,6 +30,8 @@ partial class Build : NukeBuild
     [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
     readonly string Version;
 
+    [GitRepository] readonly GitRepository Repository;
+
     private AbsolutePath _targetAppFileLocation;
     private string _releaseVersion;
 
@@ -35,6 +39,7 @@ partial class Build : NukeBuild
 
     Target SetVersion => _ => _
         .Requires(() => Version)
+        .Unlisted()
         .Executes(() =>
         {
             Assert.True(GetValidVersionRegex().IsMatch(Version), "The 'Version' Parameter needs to be in the 'SemVer' fomat of x.y.z, with optionally -alpha or -beta postfix.");
@@ -106,6 +111,24 @@ partial class Build : NukeBuild
                 releaseBinariesDirectory + ".zip",
                 compressionLevel: CompressionLevel.SmallestSize
             );
+        });
+
+    Target CreateReleaseCommitAndPush => _ => _
+        .DependsOn(SetVersion)
+        .Requires(() => Repository.IsOnMainBranch()) // This project uses Trunk Based Development
+        .Executes(() =>
+        {
+            // Stage all side-effects of SetVersion Target:
+            GitTasks.Git("add .");
+
+            // Create release commit:
+            GitTasks.Git($"commit -m \"Build {Version}\"");
+
+            // Tag release commit:
+            GitTasks.Git($"tag -a {Version} -m \"Tag build {Version}\"");
+
+            // Push to origin:
+            GitTasks.Git("push origin --tags main:main");
         });
 
     private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)

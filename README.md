@@ -34,9 +34,9 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
 3. The zip-file can be found in `<repo root>\Builds\winx64`
 
-### Updating app version
+### Creating Release Commit
 1. Open commandline in repository root.
-2. Run `nuke --target SetVersion --Version x.y.z`
+2. Run `nuke --target CreateReleaseCommitAndPush --Version x.y.z`
 	- The `Version` parameter can optionally be post-fixed with -alpha or -beta
 	- Not specifying the `Version` parameter causes the script to ask you interactively in the commandline
 
@@ -57,7 +57,8 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 	- If not, click the `Switch Platform` button in the lower right corner and wait for the switch to finish.
 4. Click the 'Build and Run' button.
 5. When asked, determine the location to build
-	- Recommendation: `<repo root>\Builds\win64` for an `Windows` target platform and `Intel 64-bit` architecture
+	- Recommendation 32 bit: `<repo root>\Builds\winx86` for an `Windows` target platform and `Intel 32-bit` architecture
+	- Recommendation 64 bit: `<repo root>\Builds\winx64` for an `Windows` target platform and `Intel 64-bit` architecture
 6. Wait for the build to complete. The game will start automatically after.
 
 ### HTML 5 (manual)
