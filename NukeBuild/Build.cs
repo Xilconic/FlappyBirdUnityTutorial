@@ -28,30 +28,10 @@ partial class Build : NukeBuild
     [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
     readonly string Version;
 
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
     private AbsolutePath _targetAppFileLocation;
     private string _releaseVersion;
 
     public static int Main() => Execute<Build>();
-
-    Target Clean => _ => _
-        .Before(Restore)
-        .Executes(() =>
-        {
-        });
-
-    Target Restore => _ => _
-        .Executes(() =>
-        {
-        });
-
-    Target Compile => _ => _
-        .DependsOn(Restore)
-        .Executes(() =>
-        {
-        });
 
     Target SetVersion => _ => _
         .Requires(() => Version)
