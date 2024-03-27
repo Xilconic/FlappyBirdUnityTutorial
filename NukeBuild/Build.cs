@@ -110,34 +110,32 @@ partial class Build : NukeBuild
 
     private static void BuildWin64BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
     {
-        UnityTasks.Unity(unitySettings =>
-        {
-            UnitySettings settings = unitySettings
-                .EnableQuit()
-                .EnableBatchMode()
-                .SetBuildTarget(UnityBuildTarget.StandaloneWindows64)
-                .SetBuildWindows64Player(targetAppFileLocation)
-                .SetProjectPath(_unityGameSrcDirectory)
-                .SetLogFile(RootDirectory / "NukeBuild" / "unity.log");
-            if (isReleaseBuild)
-            {
-                settings.AddCustomArguments("-releaseCodeOptimization");
-            }
-            return settings;
-        });
+        BuildInTargetDirectory(
+            unitySettings => _build.UnitySettingsExtensions.SetWindows64BitBuildTarget(unitySettings, targetAppFileLocation),
+            isReleaseBuild
+        );
     }
 
     private static void BuildWin32BitInTargetDirectory(AbsolutePath targetAppFileLocation, bool isReleaseBuild = false)
+    {
+        BuildInTargetDirectory(
+            unitySettings => _build.UnitySettingsExtensions.SetWindows32BitBuildTarget(unitySettings, targetAppFileLocation), 
+            isReleaseBuild
+        );
+    }
+
+    private static void BuildInTargetDirectory(
+        Func<UnitySettings, UnitySettings> setBuildTarget,
+        bool isReleaseBuild = false)
     {
         UnityTasks.Unity(unitySettings =>
         {
             UnitySettings settings = unitySettings
                 .EnableQuit()
                 .EnableBatchMode()
-                .SetBuildTarget(UnityBuildTarget.StandaloneWindows)
-                .SetBuildWindowsPlayer(targetAppFileLocation)
                 .SetProjectPath(_unityGameSrcDirectory)
                 .SetLogFile(RootDirectory / "NukeBuild" / "unity.log");
+            settings = setBuildTarget(settings);
             if (isReleaseBuild)
             {
                 settings.AddCustomArguments("-releaseCodeOptimization");
