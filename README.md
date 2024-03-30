@@ -23,21 +23,17 @@ Following the Game Makers Toolkit tutorial (https://www.youtube.com/watch?v=XtQM
 - [Nuke](https://nuke.build/docs/introduction/) v8.0.0 (Installed from commandline: `dotnet tool install Nuke.GlobalTool --global`)
 
 #### Configuring Github release capabilities
-In the `.nuke/parameters.json` the parameter `GitHubUser` has been defined.
-The `GitHubPassword` parameter is provided from the `.nuke/parameters.secrets.json`
-
 In the `.nuke/parameters.secrets.json` the `GitHubPersonalAccessToken` parameter is defined.
 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token describes how to define one for the Build Script.
 The token requires the following grants:
 - Read+Write to contents (needed for creating Releases and uploading files to a release)
 
-To generate this file:
+To generate the `.nuke/parameters.secrets.json` file:
 1. Open commandline in repository root.
 2. Run `nuke :secrets secrets`
 3. Provide a password (Save this to something like a Password Safe, as you'll require to provide it for build targets that depend on secrets)
-4. Navigate the menu to `GitHubPassword` and provide a value.
-5. Navigate the menu to `GitHubPersonalAccessToken` and provide a value.
-6. Navigate the menu to `<Save and Exit>`.
+4. Navigate the menu to `GitHubPersonalAccessToken` and provide a value.
+5. Navigate the menu to `<Save and Exit>`.
 
 ### Building a Github Release (build script)
 1. Open commandline in repository root.

@@ -37,12 +37,6 @@ partial class Build : NukeBuild
     [Parameter("The version of the build taking place; Needs to be formatted in x.y.z, optionally post-fixes with -alpha or -beta")] 
     readonly string Version;
 
-    [Parameter("The password for Github"), Secret] 
-    readonly string GitHubPassword;
-
-    [Parameter("The username for Github")]
-    readonly string GitHubUser;
-
     [Parameter("The 'Personal Access Token' used by the Build scripts for creating releases"), Secret]
     readonly string GitHubPersonalAccessToken;
 
@@ -139,8 +133,6 @@ partial class Build : NukeBuild
 
     Target CreateReleaseOnGithub => _ => _
         .Requires(() => Version)
-        //.Requires(() => GitHubUser)
-        //.Requires(() => GitHubPassword)
         .Requires(() => GitHubPersonalAccessToken)
         .DependsOn(CreateReleaseCommitAndPush)
         .DependsOn(BuildWin64BitReleaseZipFile)
@@ -151,14 +143,17 @@ partial class Build : NukeBuild
             var productInformation = new ProductHeaderValue($"{AppName}-NukeBuildScript");
             GitHubTasks.GitHubClient = new GitHubClient(productInformation)
             {
-                //Credentials = new Credentials(GitHubUser, GitHubPassword)
                 Credentials = new Credentials(GitHubPersonalAccessToken)
             };
 
+            bool isPrerelease = Version.EndsWith("alpha") || Version.EndsWith("beta");
+            string namePrefix = isPrerelease ? "Pre-release ": string.Empty;
             var releaseData = new NewRelease(Version)
             {
-                Prerelease = Version.EndsWith("alpha") || Version.EndsWith("beta"),
-                Body = "TODO"
+                Prerelease = isPrerelease,
+                Body = "TODO",
+                Draft = true,
+                Name = $"{namePrefix}{Version}"
             };
             try
             {

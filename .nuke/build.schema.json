@@ -10,19 +10,10 @@
           "type": "boolean",
           "description": "Indicates to continue a previously failed build attempt"
         },
-        "GitHubPassword": {
-          "type": "string",
-          "description": "The password for Github",
-          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
-        },
         "GitHubPersonalAccessToken": {
           "type": "string",
           "description": "The 'Personal Access Token' used by the Build scripts for creating releases",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
-        },
-        "GitHubUser": {
-          "type": "string",
-          "description": "The username for Github"
         },
         "Help": {
           "type": "boolean",
